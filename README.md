@@ -2,7 +2,7 @@
 
 **Casualties: Unknown - Better Game Save Mod**
 
-比 QoL Unknown 更强大的游戏存档管理模组，提供存档容错加载、KrokMP 联机支持，以及面向其他 mod 作者的开放 API。
+ 更强大的游戏存档管理模组，提供存档容错加载、KrokMP 联机支持，以及面向其他 mod 作者的开放 API。
 
 ## 功能概览
 
@@ -17,17 +17,6 @@
 | 多人联机支持 | 完整兼容 KrokMP 联机模组 |
 | 开放 API | 提供标准接口让其他 mod 接入存档系统 |
 
-### 与 QoL Unknown 的对比
-
-| 特性 | QoL Unknown | BetterGameSave |
-|------|:-----------:|:--------------:|
-| 基本存档加载 | ✓ | ✓ |
-| 存档容错恢复 | ✗ | ✓ |
-| 存档槽管理 UI | ✗ | ✓ |
-| KrokMP 联机支持 | 部分 | ✓ |
-| 开放第三方 API | ✗ | ✓ |
-| 多 mod 存档数据聚合 | ✗ | ✓ |
-| 存档损坏自动备份 | ✗ | ✓ |
 
 ## 开放 API
 
@@ -187,7 +176,6 @@ dotnet build BetterGameSave.sln -c Release
 
 - [ ] 存档/加载 Harmony 补丁实现
 - [ ] 存档容错恢复机制
-- [ ] KrokMP 联机存档同步
 - [ ] 存档管理 UI 实现
 - [ ] 错误诊断报告系统
 - [ ] 存档槽备份与恢复
