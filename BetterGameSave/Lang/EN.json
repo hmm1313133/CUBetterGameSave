@@ -1,0 +1,15 @@
+{
+  "ModName": "Better Game Save",
+  "MenuTitle": "Save Management",
+  "LoadButton": "Load",
+  "DeleteButton": "Delete",
+  "BackupButton": "Backup",
+  "SaveButton": "Save",
+  "ErrorLoadFailed": "Failed to load save slot {0}",
+  "ErrorSaveFailed": "Failed to save to slot {0}",
+  "ErrorCorruptedSave": "Save slot {0} appears corrupted. A backup has been created.",
+  "MultiplayerActive": "Multiplayer session active. Some features are restricted.",
+  "NoSavesFound": "No save slots found.",
+  "RegisteredMods": "Registered Mods",
+  "ModDataCount": "{0} mod(s) with save data"
+}

@@ -1,0 +1,32 @@
+# BetterGameSave .gitignore
+# Ignore everything by default, whitelist source files only
+
+*
+!*/
+
+# Solution and project files
+!.gitignore
+!*.sln
+!vars.targets
+!README.md
+!LICENSE
+
+# Source code
+!BetterGameSave/**/*.cs
+!BetterGameSave/**/*.csproj
+!BetterGameSave/**/*.json
+
+# Scripts
+!scripts/**
+
+# Release notes
+!Release/**
+
+# Allow obj/project.assets.json for restore metadata
+!**/obj/project.assets.json
+
+# But ignore build outputs
+BetterGameSave/bin/
+BetterGameSave/obj/
+**/bin/
+**/obj/

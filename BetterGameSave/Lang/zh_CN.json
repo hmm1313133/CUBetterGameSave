@@ -1,0 +1,15 @@
+{
+  "ModName": "Better Game Save",
+  "MenuTitle": "存档管理",
+  "LoadButton": "加载",
+  "DeleteButton": "删除",
+  "BackupButton": "备份",
+  "SaveButton": "保存",
+  "ErrorLoadFailed": "加载存档槽 {0} 失败",
+  "ErrorSaveFailed": "保存到存档槽 {0} 失败",
+  "ErrorCorruptedSave": "存档槽 {0} 似乎已损坏。已创建备份。",
+  "MultiplayerActive": "联机会话进行中，部分功能受限。",
+  "NoSavesFound": "未找到存档槽。",
+  "RegisteredMods": "已注册模组",
+  "ModDataCount": "{0} 个模组包含存档数据"
+}
