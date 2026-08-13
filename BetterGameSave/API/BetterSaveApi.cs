@@ -48,6 +48,16 @@ public static class BetterSaveApi
             _saveManager.RegisterDataProvider(modId, provider);
         }
 
+        public void RegisterItem(string modId, string itemId, IItemSaveProvider provider)
+        {
+            _saveManager.RegisterItem(modId, itemId, provider);
+        }
+
+        public void UnregisterItems(string modId)
+        {
+            _saveManager.UnregisterItems(modId);
+        }
+
         public void UnregisterSaveDataProvider(string modId)
         {
             _saveManager.UnregisterDataProvider(modId);
@@ -63,15 +73,22 @@ public static class BetterSaveApi
             return _saveManager.GetAllSlots();
         }
 
+        public SaveSlotInfo CreateSlot(string name) => _saveManager.CreateSlot(name);
+
+        public bool SelectSlot(string slotId) => _saveManager.SelectSlot(slotId);
+
+        public bool RenameSlot(string slotId, string newName) => _saveManager.RenameSlot(slotId, newName);
+
+        public bool DeleteSlot(string slotId) => _saveManager.DeleteSlot(slotId);
+
         public bool RequestSave()
         {
             return _saveManager.RequestSave();
         }
 
-        public bool RequestLoad(int slotIndex)
-        {
-            return _saveManager.RequestLoad(slotIndex);
-        }
+        public bool RequestLoad(int slotIndex) => _saveManager.RequestLoad(slotIndex);
+
+        public bool RequestLoad(string slotId) => _saveManager.RequestLoad(slotId);
 
         public bool IsMultiplayerActive => _saveManager.IsMultiplayerActive;
 

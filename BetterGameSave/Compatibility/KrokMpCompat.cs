@@ -1,6 +1,7 @@
 using System;
+using System.Collections;
 using System.Reflection;
-using BepInEx;
+using BepInEx.Bootstrap;
 
 namespace BetterGameSave.Compatibility;
 
@@ -11,53 +12,65 @@ namespace BetterGameSave.Compatibility;
 /// </summary>
 internal sealed class KrokMpCompat
 {
-    private const string KrokMpGuid = "com.krokosha.casualties.mp";
+    private const string KrokMpGuid = "KrokoshaCasualtiesMP";
 
     private readonly bool _isKrokMpLoaded;
-    private readonly Type? _krokMpApiType;
+    private readonly Type? _multiplayerType;
+    private readonly Type? _netPlayerType;
 
     public bool IsKrokMpActive => _isKrokMpLoaded;
 
     internal KrokMpCompat()
     {
         _isKrokMpLoaded = Chainloader.PluginInfos.ContainsKey(KrokMpGuid);
-        if (_isKrokMpLoaded)
-        {
-            // TODO: Resolve KrokMP API type via reflection for deeper integration
-            _krokMpApiType = null;
-        }
+        if (!_isKrokMpLoaded)
+            return;
+
+        var assembly = Chainloader.PluginInfos[KrokMpGuid].Instance.GetType().Assembly;
+        _multiplayerType = assembly.GetType("KrokoshaCasualtiesMP.KrokoshaScavMultiplayer");
+        _netPlayerType = assembly.GetType("KrokoshaCasualtiesMP.NetPlayer");
     }
 
     /// <summary>
     /// Check whether the current session is a multiplayer session.
     /// </summary>
-    public bool IsMultiplayerSession()
-    {
-        if (!_isKrokMpLoaded)
-            return false;
-        // TODO: Reflect into KrokMP to determine if a multiplayer session is active
-        return false;
-    }
+    public bool IsMultiplayerSession() => InvokeBool("IsNetworkActiveAndIsServer") ||
+                                         InvokeBool("IsNetworkActiveAndIsClient");
 
     /// <summary>
-    /// Check whether the local player is the host.
+    /// Check whether the local player is the host or no multiplayer session is active.
     /// </summary>
-    public bool IsHost()
-    {
-        if (!_isKrokMpLoaded)
-            return true;
-        // TODO: Reflect into KrokMP to determine host status
-        return true;
-    }
+    public bool IsHost() => !IsMultiplayerSession() || InvokeBool("IsNetworkActiveAndIsServer");
 
     /// <summary>
-    /// Get the list of connected player IDs.
+    /// Get the number of players known to KrokMP.
     /// </summary>
     public int GetConnectedPlayerCount()
     {
-        if (!_isKrokMpLoaded)
+        if (!IsMultiplayerSession())
             return 1;
-        // TODO: Reflect into KrokMP for player count
-        return 1;
+
+        try
+        {
+            var property = _netPlayerType?.GetProperty("ClientIdToPlayerDict", BindingFlags.Public | BindingFlags.Static);
+            return property?.GetValue(null) is IDictionary players ? Math.Max(1, players.Count) : 1;
+        }
+        catch
+        {
+            return 1;
+        }
+    }
+
+    private bool InvokeBool(string methodName)
+    {
+        try
+        {
+            var method = _multiplayerType?.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static);
+            return method?.Invoke(null, null) is bool result && result;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using BepInEx;
+using BepInEx.Bootstrap;
 
 namespace BetterGameSave.Compatibility;
 
@@ -33,6 +33,6 @@ internal static class ModCompatRegistry
     }
 
     public static bool IsQolLoaded => IsLoaded("org.bepinex.plugins.qol_unknown");
-    public static bool IsKrokMpLoaded => IsLoaded("com.krokosha.casualties.mp");
+    public static bool IsKrokMpLoaded => IsLoaded("KrokoshaCasualtiesMP");
     public static bool IsCUCoreLibLoaded => IsLoaded("net.cucorelib");
 }

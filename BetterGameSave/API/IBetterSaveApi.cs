@@ -10,12 +10,18 @@ namespace BetterGameSave.API;
 public interface IBetterSaveApi
 {
     /// <summary>
-    /// Register a custom save data provider. The provider's data will be
-    /// automatically serialized/deserialized alongside the game's save data.
+    /// Register a versioned opaque-data provider for mod-owned state such as NPCs,
+    /// buffs, quests, custom items, and network-owned data.
     /// </summary>
-    /// <param name="modId">Unique identifier for your mod.</param>
+    /// <param name="modId">Stable globally unique identifier for the mod.</param>
     /// <param name="provider">The save data provider implementation.</param>
     void RegisterSaveDataProvider(string modId, ISaveDataProvider provider);
+
+    /// <summary>Register a custom item ID whose world placement is managed by BetterGameSave.</summary>
+    void RegisterItem(string modId, string itemId, IItemSaveProvider provider);
+
+    /// <summary>Unregister all item registrations owned by a mod.</summary>
+    void UnregisterItems(string modId);
 
     /// <summary>
     /// Unregister a previously registered save data provider.
@@ -33,15 +39,30 @@ public interface IBetterSaveApi
     /// </summary>
     IReadOnlyList<SaveSlotInfo> GetAllSlots();
 
+    /// <summary>Create and select an empty named save slot.</summary>
+    SaveSlotInfo CreateSlot(string name);
+
+    /// <summary>Select an existing slot for subsequent saves.</summary>
+    bool SelectSlot(string slotId);
+
+    /// <summary>Rename a save slot without changing its stable ID.</summary>
+    bool RenameSlot(string slotId, string newName);
+
+    /// <summary>Delete a save slot.</summary>
+    bool DeleteSlot(string slotId);
+
     /// <summary>
     /// Trigger a manual save. Returns true if the save was successful.
     /// </summary>
     bool RequestSave();
 
     /// <summary>
-    /// Trigger a manual load. Returns true if the load was successful.
+    /// Trigger a manual load by current list index. Returns true if the load was successful.
     /// </summary>
     bool RequestLoad(int slotIndex);
+
+    /// <summary>Trigger a manual load using a stable slot ID.</summary>
+    bool RequestLoad(string slotId);
 
     /// <summary>
     /// Check whether KrokMP (multiplayer mod) is active.

@@ -1,34 +1,62 @@
-using System;
-using BepInEx;
+using System.Reflection;
+using BepInEx.Bootstrap;
+using BepInEx.Logging;
+using HarmonyLib;
 
 namespace BetterGameSave.Compatibility;
 
 /// <summary>
-/// QoL Unknown mod compatibility layer.
-/// BetterGameSave provides a superset of QoL's save functionality,
-/// so when both are present we suppress QoL's save features and take over.
+/// Keeps QoL's unrelated features enabled while removing its complete save subsystem.
 /// </summary>
 internal sealed class QolCompat
 {
     private const string QolGuid = "org.bepinex.plugins.qol_unknown";
 
-    private readonly bool _isQolLoaded;
-
-    public bool IsQolLoaded => _isQolLoaded;
-
-    internal QolCompat()
+    private static readonly string[] SavePatchOwners =
     {
-        _isQolLoaded = Chainloader.PluginInfos.ContainsKey(QolGuid);
+        "org.bepinex.plugins.qol.savesavemenu",
+        "org.bepinex.plugins.qol.savemenu",
+        "org.bepinex.plugins.qol.savemanager",
+        "org.bepinex.plugins.qol.savesystem",
+        "org.bepinex.plugins.qol.savepanel",
+        "org.bepinex.plugins.qol.multiplayer_save_load",
+        "org.bepinex.plugins.qol.layertransition",
+    };
+
+    private readonly ManualLogSource _log;
+
+    public bool IsQolLoaded { get; }
+
+    internal QolCompat(ManualLogSource log)
+    {
+        _log = log;
+        IsQolLoaded = Chainloader.PluginInfos.ContainsKey(QolGuid);
     }
 
-    /// <summary>
-    /// If QoL is loaded, suppress its save-related functionality to avoid conflicts.
-    /// BetterGameSave will handle all save/load operations instead.
-    /// </summary>
-    public void SuppressQolSaveFeatures()
+    internal void SuppressQolSaveFeatures()
     {
-        if (!_isQolLoaded)
+        if (!IsQolLoaded)
             return;
-        // TODO: Patch or reflect QoL to disable its save hooks
+
+        foreach (var owner in SavePatchOwners)
+            new Harmony(owner).UnpatchSelf();
+
+        var plugin = Chainloader.PluginInfos[QolGuid].Instance;
+        var moduleManager = plugin.GetType().Assembly.GetType("QoL_Unknown.QoLModuleManager");
+        var isEnabled = moduleManager?.GetMethod("IsEnabled", BindingFlags.Public | BindingFlags.Static);
+        if (isEnabled != null)
+        {
+            var harmony = new Harmony(Plugin.ModGuid + ".qolcompat");
+            harmony.Patch(isEnabled, postfix: new HarmonyMethod(
+                typeof(QolCompat).GetMethod(nameof(FilterSaveModules), BindingFlags.NonPublic | BindingFlags.Static)));
+        }
+
+        _log.LogInfo("QoL detected: disabled QoL save UI, autosave, slot, load and multiplayer-save patches.");
+    }
+
+    private static void FilterSaveModules(string id, ref bool __result)
+    {
+        if (id == "qol_save_menu" || id == "qol_autosave")
+            __result = false;
     }
 }
